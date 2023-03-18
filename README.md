@@ -31,14 +31,14 @@ become: true
 tasks:
 - name: Install NMS server binary
   include_role:
-    name: ansible-nocloud-metadata-server
+    name: jalseth.nocloud_metadata_server
   vars:
     nocloud_metadata_server_enable_systemd: false
     nocloud_metadata_server_config: {}
 
 - name: Configure NMS instances
   include_role:
-    name: ansible-nocloud-metadata-server
+    name: jalseth.nocloud_metadata_server
   vars:
     nocloud_metadata_server_systemd_service_name: "nocloud-metadata-server-{{ nms.name }}"
     nocloud_metadata_server_systemd_service_file_path: "/lib/systemd/system/nocloud-metadata-server-{{ nms.name}}.service"
