@@ -1,0 +1,14 @@
+galaxy_info:
+  author: James Alseth
+  namespace: jalseth
+  description: Installs and configures the NoCloud Metadata Server
+  license: MIT
+
+  issue_tracker_url: https://github.com/jalseth/ansible-nocloud-metadata-server/issues
+
+  min_ansible_version: 2.1
+  galaxy_tags:
+  - cloud-init
+  - nocloud
+
+dependencies: []

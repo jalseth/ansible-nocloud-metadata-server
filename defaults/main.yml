@@ -1,0 +1,13 @@
+---
+nocloud_metadata_server_install_from_remote: true
+nocloud_metadata_server_version: "latest"
+nocloud_metadata_server_bin_path: "/usr/local/bin/nocloud-metadata-server"
+nocloud_metadata_server_bin_owner: "root"
+
+nocloud_metadata_server_enable_systemd: true
+nocloud_metadata_server_systemd_service_name: "nocloud-metadata-server"
+nocloud_metadata_server_systemd_service_file_path: "/lib/systemd/system/nocloud-metadata-server.service"
+
+nocloud_metadata_server_config: {}
+nocloud_metadata_server_config_file_path: "/etc/nocloud-metadata-server.yaml"
+nocloud_metadata_server_config_file_owner: "root"

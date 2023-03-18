@@ -1,0 +1,8 @@
+---
+- name: Write config file
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: "{{ nocloud_metadata_server_config_file_path }}"
+    owner: "{{ nocloud_metadata_server_config_file_owner }}"
+    mode: 0600
+  register: _nocloud_config

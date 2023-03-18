@@ -1,0 +1,15 @@
+---
+- name: Install the server
+  ansible.builtin.include_tasks:
+    file: install.yml
+  when: nocloud_metadata_server_install_from_remote
+
+- name: Configure the server
+  ansible.builtin.include_tasks:
+    file: configure.yml
+  when: nocloud_metadata_server_config | length > 0
+
+- name: Configure the systemd service
+  ansible.builtin.include_tasks:
+    file: systemd.yml
+  when: nocloud_metadata_server_enable_systemd

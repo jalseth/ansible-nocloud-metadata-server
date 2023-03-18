@@ -1,0 +1,91 @@
+---
+- name: Create temp dir
+  ansible.builtin.tempfile:
+    prefix: nocloudmetadataserver-
+    state: directory
+  register: _nocloud_temp_dir
+
+- name: Set arch fact
+  ansible.builtin.set_fact:
+    _nocloud_metadata_server_arch: >-
+      {{
+        ansible_architecture
+        | replace('x86_64', 'amd64')
+        | replace('aarch64', 'arm64')
+      }}
+
+- name: Get latest version
+  ansible.builtin.get_url:
+    url: https://api.github.com/repos/jalseth/nocloud-metadata-server/releases/latest
+    headers:
+      Accept: "application/vnd.github+json"
+      X-GitHub-Api-Version: "2022-11-28"
+    dest: "{{ _nocloud_temp_dir.path }}/latest_release.json"
+  when: nocloud_metadata_server_version == 'latest'
+
+- name: Register latest version
+  ansible.builtin.shell:
+    cmd: "cat {{ _nocloud_temp_dir.path }}/latest_release.json"
+  when: nocloud_metadata_server_version == 'latest'
+  register: _nocloud_latest_version_contents
+
+- name: Set install version fact
+  ansible.builtin.set_fact:
+    _nocloud_install_version: >-
+      {{
+        _nocloud_latest_version_contents.stdout
+        | from_json
+        | community.general.json_query('tag_name')
+      }}
+  when: nocloud_metadata_server_version == 'latest'
+
+- name: Set install version fact
+  ansible.builtin.set_fact:
+    _nocloud_install_version: "{{ nocloud_metadata_server_version }}"
+  when: nocloud_metadata_server_version != 'latest'
+
+- name: Set URL facts
+  ansible.builtin.set_fact:
+    nocloud_metadata_server_shasum_url: "https://github.com/jalseth/nocloud-metadata-server/releases/download/{{ _nocloud_install_version }}/checksums.txt"
+    nocloud_metadata_server_binary_url: "https://github.com/jalseth/nocloud-metadata-server/releases/download/{{ _nocloud_install_version }}/nocloud-metadata-server_{{ _nocloud_install_version }}_linux_{{ _nocloud_metadata_server_arch }}.tar.gz"
+
+- name: Download the checksums
+  ansible.builtin.get_url:
+    url: "{{ nocloud_metadata_server_shasum_url }}"
+    dest: "{{ _nocloud_temp_dir.path }}/shasums.txt"
+
+- name: Register expected SHA256 sum
+  ansible.builtin.shell:
+    cmd: >-
+      grep "{{ _nocloud_metadata_server_arch }}" "{{ _nocloud_temp_dir.path }}/shasums.txt"
+      | awk '{ print $1 }'
+  register: _nocloud_expected_sha256sum
+
+- name: Download the tarball
+  ansible.builtin.get_url:
+    url: "{{ nocloud_metadata_server_binary_url }}"
+    dest: "{{ _nocloud_temp_dir.path }}/nms.tar.gz"
+    checksum: "sha256:{{ _nocloud_expected_sha256sum.stdout }}"
+  register: _nocloud_tarball
+
+- name: Extract the binary
+  ansible.builtin.unarchive:
+    src: "{{ _nocloud_temp_dir.path }}/nms.tar.gz"
+    remote_src: true
+    dest: "{{ _nocloud_temp_dir.path }}"
+  when: _nocloud_tarball.changed
+
+- name: Install the binary
+  ansible.builtin.copy:
+    src: "{{ _nocloud_temp_dir.path }}/nocloud-metadata-server"
+    remote_src: true
+    dest: "{{ nocloud_metadata_server_bin_path }}"
+    mode: 0755
+    owner: "{{ nocloud_metadata_server_bin_owner }}"
+  register: _nocloud_binary
+
+- name: Cleanup temp dir
+  ansible.builtin.file:
+    path: "{{ _nocloud_temp_dir.path }}"
+    state: absent
+    force: true

@@ -1,0 +1,13 @@
+[Unit]
+Description=NoCloud Metadata Server
+After=network.target
+
+[Service]
+ExecStart={{ nocloud_metadata_server_bin_path }} -config {{ nocloud_metadata_server_config_file_path }}
+KillMode=process
+Restart=on-failure
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
+Alias={{ nocloud_metadata_server_systemd_service_name }}.service

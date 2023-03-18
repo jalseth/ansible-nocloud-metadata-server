@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include jalseth.nocloud_metadata_server"
+      include_role:
+        name: "jalseth.nocloud_metadata_server"
