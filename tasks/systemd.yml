@@ -12,14 +12,20 @@
     daemon_reload: true
   when: _nocloud_systemd_template.changed
 
-- name: Enable the service
+- name: Start the service
   ansible.builtin.systemd:
     name: "{{ nocloud_metadata_server_systemd_service_name }}.service"
-    state: >-
-      {{
-        _nocloud_systemd_template.changed
-        or _nocloud_binary.changed
-        or _nocloud_config.changed
-        | ternary('restarted', 'started')
-      }}
+    state: started
     enabled: true
+
+- name: Restart the service if needed
+  ansible.builtin.systemd:
+    name: "{{ nocloud_metadata_server_systemd_service_name }}.service"
+    state: restarted
+  when: _nocloud_systemd_template.changed or _nocloud_binary.changed
+
+- name: Reload the config if needed
+  ansible.builtin.systemd:
+    name: "{{ nocloud_metadata_server_systemd_service_name }}.service"
+    state: reloaded
+  when: _nocloud_config.changed
