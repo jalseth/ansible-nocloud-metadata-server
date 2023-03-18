@@ -5,15 +5,11 @@ Installs and configures an instance of the
 
 ## Installation
 
-This role is not published on Ansible Galaxy yet, but it can be installed by
-cloning the Git repo.
-
 ```sh
-ansible-galaxy install \
-  git+https://github.com/jalseth/ansible-nocloud-metadata-server.git
+ansible-galaxy install jalseth.nocloud_metadata_server
 ```
 
-## Python dependencies
+### Python dependencies
 
 - `jmespath` for JSON parsing
 

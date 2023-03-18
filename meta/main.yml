@@ -1,4 +1,5 @@
 galaxy_info:
+  role_name: nocloud_metadata_server
   author: James Alseth
   namespace: jalseth
   description: Installs and configures the NoCloud Metadata Server
