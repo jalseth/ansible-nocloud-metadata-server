@@ -57,7 +57,7 @@
 - name: Register expected SHA256 sum
   ansible.builtin.shell:
     cmd: >-
-      grep "{{ _nocloud_metadata_server_arch }}" "{{ _nocloud_temp_dir.path }}/shasums.txt"
+      grep "linux_{{ _nocloud_metadata_server_arch }}" "{{ _nocloud_temp_dir.path }}/shasums.txt"
       | awk '{ print $1 }'
   register: _nocloud_expected_sha256sum
 
